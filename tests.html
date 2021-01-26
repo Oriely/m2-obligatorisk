@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Test Suite</title>
+    <link rel="stylesheet" href="https://code.jquery.com/qunit/qunit-2.14.0.css">
+  </head>
+  <body>
+    <div id="qunit"></div>
+    <div id="qunit-fixture"></div>
+    <script src="https://code.jquery.com/qunit/qunit-2.14.0.js"></script>
+    <script src="controller.js"></script>
+    <script>
+        let todos = {};
+        const add = (a, b) => a + b;
+
+        function updateScreen() {
+
+        }
+
+        let todoHTML_high = '';
+        let todoHTML_low = ''
+        let todoHTML_medium = '';
+        let input_title = '';
+        let input_content = '';
+        let input_priority = '';
+        let errors = '';
+        let mode = '';
+        let selectedToEdit = '';
+        let input_title_edit = '';
+        let input_content_edit = '';
+        let priority = [1, 2, 3];
+        let filter = '';
+        let sorting = '';
+        let on_page = 'main';
+
+        QUnit.module('ting', function() {
+          ////////////////////////////////
+          QUnit.test('check object added', function(assert) {
+
+            input_content = '123';
+            input_title = '123';
+
+            input_priority = 1;
+
+            const obj = addTodo();
+
+            assert.equal(obj.title, '123');
+            assert.equal(obj.content, '123')
+            assert.equal(obj.priority, 1);
+
+          });
+
+          ////////////////////////////////
+          QUnit.test('edited todo', function(assert) {
+            
+            let date = Date.now();
+            todos = {    ekg: {
+                id: 213,
+                date_added: date,
+                date_edited: '',
+                date_finished: '',
+                title: 'Sigve',
+                content: 'Sigve',
+                priority: 3,
+                completed: false
+            },};
+
+
+            editTodo('ekg');
+            
+            input_title_edit = '122';
+            input_content_edit = '122';
+
+            editTodo('ekg')
+
+            console.log(selectedToEdit);
+            
+            let expected = {
+              ekg:{
+                id: 213,
+                date_added: date,
+                date_edited: Date.now(),
+                date_finished: '',
+                title: '122',
+                content: '122',
+                priority: 3,
+                completed: false
+            }
+            };
+
+            console.log('todos',todos);
+            console.log('expected', expected);
+            console.log(todos.ekg.title, expected.ekg.title);
+            console.log(todos.ekg.content, expected.ekg.content)
+            assert.equal(todos.ekg.title, expected.ekg.title);
+            assert.equal(todos.ekg.priority, expected.ekg.priority);
+            assert.equal(todos.ekg.content, expected.ekg.content);
+
+
+
+          });
+          ////////////////////////////////
+          QUnit.test('complete todo', function(assert) {
+
+            let date = Date.now();
+            todos = {    
+              123: {
+                id: 213,
+                date_added: date,
+                date_edited: '',
+                date_finished: '',
+                title: '123123123',
+                content: 'asdoqdpoqkdpqkwdpoqwkdpqkwdpoqwd',
+                priority: 3,
+                completed: false
+            },};
+
+            completeTodo(123);
+
+            let expected  = {    
+              123: {
+                id: 213,
+                date_added: date,
+                date_edited: '',
+                date_finished: Date.now(),
+                title: '123123123',
+                content: 'asdoqdpoqkdpqkwdpoqwkdpqkwdpoqwd',
+                priority: 3,
+                completed: true
+            },};
+
+
+            assert.deepEqual(todos, expected);
+          });
+
+          ////////////////////////////////
+          QUnit.test('remove todo', function(assert) {
+            
+            todos = {    
+              123: {
+                id: 213,
+                date_added: Date.now(),
+                date_edited: '',
+                date_finished: '',
+                title: '123123123',
+                content: 'asdoqdpoqkdpqkwdpoqwkdpqkwdpoqwd',
+                priority: 3,
+                completed: false
+            }
+          };
+
+
+            removeTodo(123);
+
+            let expected = {};
+
+            assert.deepEqual(todos, expected);
+
+
+          });
+          
+          ////////////////////////////////
+          QUnit.test('feil?', function(assert) {
+            input_content = '';
+            input_title = '';
+            input_priority = '';
+
+            todos = {    
+              ekg: {
+                id: 213,
+                date_added: Date.now(),
+                date_edited: '',
+                date_finished: '',
+                title: '123123123',
+                content: 'asdoqdpoqkdpqkwdpoqwkdpqkwdpoqwd',
+                priority: 3,
+                completed: false
+            },};
+
+            addTodo()
+
+            let expected  = {    
+              ekg: {
+                id: 213,
+                date_added: Date.now(),
+                date_edited: '',
+                date_finished: '',
+                title: '123123123',
+                content: 'asdoqdpoqkdpqkwdpoqwkdpqkwdpoqwd',
+                priority: 3,
+                completed: false
+            },};
+
+            assert.deepEqual(todos,expected)
+           
+          });
+          
+          ////////////////////////////////
+          QUnit.test('feil 2?', function(assert) {
+            mode = 'sdadasd';
+
+            input_content_edit = 'aASDSDASDASD';
+            input_title_edit = 'ASDASDASDASDASDA';
+
+            let date = Date.now()
+
+            todos = {    
+              ekg: {
+                id: 213,
+                date_added: date,
+                date_edited: '',
+                date_finished: '',
+                title: '123123123',
+                content: 'asdoqdpoqkdpqkwdpoqwkdpqkwdpoqwd',
+                priority: 3,
+                completed: false
+            },};
+
+            editTodo('ekg')
+
+            editTodo('ekg');
+
+            let expected  = {    
+              ekg: {
+                id: 213,
+                date_added: date,
+                date_edited: Date.now(),
+                date_finished: '',
+                title: 'ASDASDASDASDASDA',
+                content: 'aASDSDASDASD',
+                priority: 3,
+                completed: false
+            }
+            
+            };
+            // console.log(todos);
+            // console.log(expected)
+
+            assert.deepEqual(todos,expected)
+           
+          });
+
+        });
+      
+      </script>
+      
+</body>
+</html>
