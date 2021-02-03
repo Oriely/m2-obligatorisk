@@ -19,30 +19,63 @@
 
         }
 
-        let todoHTML_high = '';
-        let todoHTML_low = ''
-        let todoHTML_medium = '';
-        let input_title = '';
-        let input_content = '';
-        let input_priority = '';
+        let model = {
+          ppa: {
+              on_page: 'main',
+              filter: '',
+              sorting: ''
+          },
+          inputs: {
+              edit: {
+                  mode: '',
+                  selectedToEdit: '',
+                  title: '',
+                  content:'',
+                  priority: ''
+              },
+              new: {
+                  title: '',
+                  content:'',
+                  priority:''
+              }
+          }
+
+      };
         let errors = '';
         let mode = '';
-        let selectedToEdit = '';
-        let input_title_edit = '';
-        let input_content_edit = '';
+
         let priority = [1, 2, 3];
-        let filter = '';
-        let sorting = '';
-        let on_page = 'main';
+
 
         QUnit.module('ting', function() {
           ////////////////////////////////
           QUnit.test('check object added', function(assert) {
+            model = {
+                  ppa: {
+                  on_page: 'main',
+                  filter: '',
+                  sorting: ''
+              },
+              inputs: {
+                  edit: {
+                      mode: '',
+                      selectedToEdit: '',
+                      title: '',
+                      content:'',
+                      priority: ''
+                  },
+                  new: {
+                      title: '',
+                      content:'',
+                      priority:''
+                  }
+              }
+            }
 
-            input_content = '123';
-            input_title = '123';
+            model.inputs.new.content = '123';
+            model.inputs.new.title = '123';
 
-            input_priority = 1;
+            model.inputs.new.priority = 1;
 
             const obj = addTodo();
 
@@ -54,7 +87,29 @@
 
           ////////////////////////////////
           QUnit.test('edited todo', function(assert) {
+            model = {
+              ppa: {
+              on_page: 'main',
+              filter: '',
+              sorting: ''
+          },
+          inputs: {
+              edit: {
+                  mode: '',
+                  selectedToEdit: '',
+                  title: '',
+                  content:'',
+                  priority: ''
+              },
+              new: {
+                  title: '',
+                  content:'',
+                  priority:''
+              }
+          }
+            }
             
+            console.log(model.inputs.edit);
             let date = Date.now();
             todos = {    ekg: {
                 id: 213,
@@ -70,13 +125,12 @@
 
             editTodo('ekg');
             
-            input_title_edit = '122';
-            input_content_edit = '122';
+            console.log(model.inputs.edit);
+            model.inputs.edit.title = '122';
+            model.inputs.edit.content = '122';
 
-            editTodo('ekg')
-
-            console.log(selectedToEdit);
-            
+            editTodo('ekg');
+            console.log(model.inputs.edit);
             let expected = {
               ekg:{
                 id: 213,
@@ -89,11 +143,7 @@
                 completed: false
             }
             };
-
-            console.log('todos',todos);
-            console.log('expected', expected);
-            console.log(todos.ekg.title, expected.ekg.title);
-            console.log(todos.ekg.content, expected.ekg.content)
+            console.log(model.inputs.edit);
             assert.equal(todos.ekg.title, expected.ekg.title);
             assert.equal(todos.ekg.priority, expected.ekg.priority);
             assert.equal(todos.ekg.content, expected.ekg.content);
@@ -103,41 +153,84 @@
           });
           ////////////////////////////////
           QUnit.test('complete todo', function(assert) {
-
+            model = {
+              ppa: {
+              on_page: 'main',
+              filter: '',
+              sorting: ''
+          },
+          inputs: {
+              edit: {
+                  mode: '',
+                  selectedToEdit: '',
+                  title: '',
+                  content:'',
+                  priority: ''
+              },
+              new: {
+                  title: '',
+                  content:'',
+                  priority:''
+              }
+          }
+            };
             let date = Date.now();
             todos = {    
-              123: {
-                id: 213,
-                date_added: date,
-                date_edited: '',
-                date_finished: '',
-                title: '123123123',
-                content: 'asdoqdpoqkdpqkwdpoqwkdpqkwdpoqwd',
-                priority: 3,
-                completed: false
-            },};
+                  test: {
+                    id: 213,
+                    date_added: date,
+                    date_edited: '',
+                    date_finished: '',
+                    title: '123123123',
+                    content: 'asdoqdpoqkdpqkwdpoqwkdpqkwdpoqwd',
+                    priority: 3,
+                    completed: false
+                },
+            };
 
-            completeTodo(123);
+            const obj = completeTodo('test');
 
-            let expected  = {    
-              123: {
-                id: 213,
-                date_added: date,
-                date_edited: '',
-                date_finished: Date.now(),
-                title: '123123123',
-                content: 'asdoqdpoqkdpqkwdpoqwkdpqkwdpoqwd',
-                priority: 3,
-                completed: true
-            },};
+            console.log('test', obj.completed)
+            const expected  = {
+                    id: 213,
+                    date_added: date,
+                    date_edited: '',
+                    date_finished: obj.date_finished,
+                    title: '123123123',
+                    content: 'asdoqdpoqkdpqkwdpoqwkdpqkwdpoqwd',
+                    priority: 3,
+                    completed: true
+                };
 
+           console.log(expected.completed)
 
-            assert.deepEqual(todos, expected);
+            assert.equal(obj.completed, expected.completed);
+            assert.equal(obj.date_finished, expected.date_finished)
           });
 
           ////////////////////////////////
           QUnit.test('remove todo', function(assert) {
-            
+            model = {
+              ppa: {
+              on_page: 'main',
+              filter: '',
+              sorting: ''
+          },
+          inputs: {
+              edit: {
+                  mode: '',
+                  selectedToEdit: '',
+                  title: '',
+                  content:'',
+                  priority: ''
+              },
+              new: {
+                  title: '',
+                  content:'',
+                  priority:''
+              }
+          }
+            }
             todos = {    
               123: {
                 id: 213,
@@ -163,6 +256,27 @@
           
           ////////////////////////////////
           QUnit.test('feil?', function(assert) {
+            model = {
+              ppa: {
+              on_page: 'main',
+              filter: '',
+              sorting: ''
+          },
+          inputs: {
+              edit: {
+                  mode: '',
+                  selectedToEdit: '',
+                  title: '',
+                  content:'',
+                  priority: ''
+              },
+              new: {
+                  title: '',
+                  content:'',
+                  priority:''
+              }
+          }
+            }
             input_content = '';
             input_title = '';
             input_priority = '';
@@ -199,10 +313,28 @@
           
           ////////////////////////////////
           QUnit.test('feil 2?', function(assert) {
-            mode = 'sdadasd';
 
-            input_content_edit = 'aASDSDASDASD';
-            input_title_edit = 'ASDASDASDASDASDA';
+            model = {
+              ppa: {
+              on_page: 'main',
+              filter: '',
+              sorting: ''
+          },
+          inputs: {
+              edit: {
+                  mode: '',
+                  selectedToEdit: '',
+                  title: '',
+                  content:'',
+                  priority: ''
+              },
+              new: {
+                  title: '',
+                  content:'',
+                  priority:''
+              }
+          }
+            }
 
             let date = Date.now()
 
@@ -212,13 +344,19 @@
                 date_added: date,
                 date_edited: '',
                 date_finished: '',
-                title: '123123123',
-                content: 'asdoqdpoqkdpqkwdpoqwkdpqkwdpoqwd',
+                title: 'test',
+                content: 'test',
                 priority: 3,
                 completed: false
             },};
 
-            editTodo('ekg')
+            editTodo('ekg');
+            
+            model.inputs.edit.mode = 'sdadasd';
+            model.inputs.new.content = 'hallo';
+
+            model.inputs.new.title = 'hei!';
+            console.log()
 
             editTodo('ekg');
 
@@ -226,15 +364,13 @@
               ekg: {
                 id: 213,
                 date_added: date,
-                date_edited: Date.now(),
+                date_edited: '',
                 date_finished: '',
-                title: 'ASDASDASDASDASDA',
-                content: 'aASDSDASDASD',
+                title: 'test',
+                content: 'test',
                 priority: 3,
                 completed: false
-            }
-            
-            };
+            },};
             // console.log(todos);
             // console.log(expected)
 

@@ -1,5 +1,32 @@
 
 
+let errors = '';
+let priority = [1, 2, 3];
+
+
+let model = {
+    ppa: {
+        on_page: 'main',
+        filter: '',
+        sorting: ''
+    },
+    inputs: {
+        edit: {
+            mode: '',
+            selectedToEdit: '',
+            title: '',
+            content:'',
+            priority: ''
+        },
+        new: {
+            title: '',
+            content:'',
+            priority:''
+        }
+    }
+
+};
+
 let todos = {
     [keyGen()]: {
         id: genId(),
@@ -116,27 +143,13 @@ let todos = {
 };
 
 let container = document.getElementById('container');
-let todoHTML_high = '';
-let todoHTML_low = ''
-let todoHTML_medium = '';
-let input_title = '';
-let input_content = '';
-let input_priority = '';
-let errors = '';
-let mode = '';
-let selectedToEdit = '';
-let input_title_edit = '';
-let input_content_edit = '';
-let priority = [1, 2, 3];
-let filter = '';
-let sorting = '';
-let on_page = 'main';
+
 
 function updateScreen() {
-    if (on_page == "main") {
+    if (model.ppa.on_page == "main") {
         mainPage();
     }
-    if (on_page == 'second') {
+    if (model.ppa.on_page == 'second') {
         secondPage();
     }
 }
@@ -146,19 +159,19 @@ updateScreen();
 function todoCreateHTML(id) {
     return `
         <div class="todo-wrapper${(todos[id].completed === true ? ' fin' : '')}${setPriority(todos[id].priority)}" >
-            <div class="todo-title">${(mode == 'edit' && id == selectedToEdit ? '<input class="edit" type="text" onkeyup="input_title_edit = this.value" value="' + todos[id].title +'">' : '<h1>' + todos[id].title + '</h1>')}</div>
+            <div class="todo-title">${(model.inputs.edit.mode == 'edit' && id == model.inputs.edit.selectedToEdit ? '<input class="edit" type="text" onkeyup="input_title_edit = this.value" value="' + todos[id].title +'">' : '<h1>' + todos[id].title + '</h1>')}</div>
             <div class="todo-dates">
                 <span>Added: ${stupidToReadableDate(todos[id].date_added)}</span>
                 <span>${(todos[id].date_finished != '' ? 'Completed: ' + stupidToReadableDate(todos[id].date_finished) : '')}</span>
                 <span>${(todos[id].date_edited != '' ? 'Edited: ' + todos[id].date_edited : '')}</span>
             </div>
             <div class="todo-content">  
-                ${(mode == 'edit' && id == selectedToEdit ? '<textarea class="edit" onkeyup="input_content_edit = this.value">'+ todos[id].content + '</textarea>' : todos[id].content)}
+                ${(model.inputs.edit.mode == 'edit' && id == model.inputs.edit.electedToEdit ? '<textarea class="edit" onkeyup="input_content_edit = this.value">'+ todos[id].content + '</textarea>' : todos[id].content)}
             </div>
             <div>Priority: ${(todos[id].priority === 1 ? 'High' : '') || (todos[id].priority === 2 ? 'Medium' : '') ||(todos[id].priority === 3 ? 'Low' : '')}</div>
             <div class="todo-controls-edit">
-                ${(todos[id].completed == true ? '' : '<button '+ (id != selectedToEdit && mode == 'edit' ? 'disabled ' : '') + 'onclick="editTodo(\''+id+'\')">' + (id == selectedToEdit ? (mode == 'edit' ? 'Save' : 'Edit') : 'Edit') + '</button>')}
-                ${(todos[id].completed == false ? '<button ' + (mode == 'edit' ? 'disabled' : '') + ' onclick="completeTodo(\''+id+'\');">Complete</button>' : '')}
+                ${(todos[id].completed == true ? '' : '<button '+ (id != model.inputs.edit.selectedToEdit && model.inputs.edit.mode == 'edit' ? 'disabled ' : '') + 'onclick="editTodo(\''+id+'\')">' + (id == model.inputs.edit.selectedToEdit ? (model.inputs.edit.mode == 'edit' ? 'Save' : 'Edit') : 'Edit') + '</button>')}
+                ${(todos[id].completed == false ? '<button ' + (model.inputs.edit.mode == 'edit' ? 'disabled' : '') + ' onclick="completeTodo(\''+id+'\');">Complete</button>' : '')}
     
                 <button onclick="removeTodo('${id}')">Remove</button>
             </div>
@@ -173,35 +186,14 @@ function stupidToReadableDate(date) {
 
 
 function mainPage() {
-    todoHTML_high = '';
-    todoHTML_low = '';
-    todoHTML_medium = '';
 
+    let html = '';
     
-    for (let keys in todos) {
-
-        if (todos[keys].completed === false ) {
-            if (todos[keys].priority === 1) {
-                todoHTML_high += todoCreateHTML(keys);
-            }
-        
-
-            if (todos[keys].priority === 2) {
-
-                todoHTML_medium += todoCreateHTML(keys);
-            }
 
         
 
-            if (todos[keys].priority === 3) {
-                todoHTML_low += todoCreateHTML(keys);
-            }
-        } 
-    }
-        
 
-
-    container.innerHTML = `
+    html += `
     <div class="wrapper">
         <nav>
             <div onclick="changeScreen('main')">Main</div>
@@ -227,19 +219,13 @@ function mainPage() {
                 <div class="todo-filter">
                     <label>Filter by</label>
                     <select name="cars" id="cars" onchange="filterTodos(this)">
-                        <option ${(filter == 0 ? 'selected' + ' ': '')}value="0">Nothing</option>
-                        <option ${(filter == 1 ? 'selected' + ' ': '')}value="1">High</option>
-                        <option ${(filter == 2 ? 'selected' + ' ': '')}value="2">Medium</option>
-                        <option ${(filter == 3 ? 'selected' + ' ': '')}value="3">Low</option>
+                        <option ${(model.ppa.filter == 0 ? 'selected' + ' ': '')}value="0">Nothing</option>
+                        <option ${(model.ppa.filter == 1 ? 'selected' + ' ': '')}value="1">High</option>
+                        <option ${(model.ppa.filter == 2 ? 'selected' + ' ': '')}value="2">Medium</option>
+                        <option ${(model.ppa.filter == 3 ? 'selected' + ' ': '')}value="3">Low</option>
                     </select>
                 </div>
-                <div class="todo-sort">
-                    <label>Sort by</label>
-                    <select name="cars" id="cars" onchange="sortTodos(this)">
-                        <option ${(sorting == 1 ? 'selected' + ' ': '')}value="1">High > Low</option>
-                        <option ${(sorting == 2 ? 'selected' + ' ': '')}value="2">Low > High</option>
-                    </select>
-                </div>
+                
                 </div>
             </div>
             
@@ -247,39 +233,80 @@ function mainPage() {
         </div>
        
         <div class="todos">
-            ${listTodos(filter, sorting)}
+        `;
+        if(model.ppa.filter == 0) {
+            for (let keys in todos) {
+
+                if (todos[keys].completed === false ) {
+                    if (todos[keys].priority === 1) {
+                        html += todoCreateHTML(keys);
+                    }
             
-        </div>
-    </div>
-    `;
-}
-
-
-function secondPage() {
-    todoHTML_high = '';
-    todoHTML_low = '';
-    todoHTML_medium = '';
-    for (let keys in todos) {
-
-        if (todos[keys].completed === true ) {
-            if (todos[keys].priority === 1) {
-                todoHTML_high += todoCreateHTML(keys);
+            
+                    if (todos[keys].priority === 2) {
+                        html += todoCreateHTML(keys);
+                    }
+         
+                    if (todos[keys].priority === 3) {
+                        html += todoCreateHTML(keys);
+                    }
+                }
+                
             }
-    
-    
-            if (todos[keys].priority === 2) {
-                todoHTML_medium += todoCreateHTML(keys);
+        }
+        if(model.ppa.filter == 1) {
+            for (let keys in todos) {
+
+                if (todos[keys].completed === false ) {
+
+                    if (todos[keys].priority === 1) {
+                        html += todoCreateHTML(keys);
+                    }
+                }
+                
             }
- 
-            if (todos[keys].priority === 3) {
-                todoHTML_low += todoCreateHTML(keys);
+        }
+        if(model.ppa.filter == 2) {
+            for (let keys in todos) {
+
+                if (todos[keys].completed === false ) {
+
+                    if (todos[keys].priority === 2) {
+                        html += todoCreateHTML(keys);
+                    }
+                }
+                
+            }
+        }
+        if(model.ppa.filter == 3) {
+            for (let keys in todos) {
+
+                if (todos[keys].completed === false ) {
+                    if (todos[keys].priority === 3) {
+                        html += todoCreateHTML(keys);
+                    }
+                }
+                
             }
         }
         
-    }
 
 
-    container.innerHTML = `
+        html += `
+        </div>
+    </div>
+    `;
+
+    container.innerHTML = html;
+}
+
+
+
+function secondPage() {
+    let html = '';
+
+
+    html += `
     <div class="wrapper">
         <nav>
             <div onclick="changeScreen('main')">Main</div>
@@ -289,49 +316,80 @@ function secondPage() {
                 <div class="todo-filter">
                     <label>Filter by</label>
                     <select name="cars" id="cars" onchange="filterTodos(this)">
-                        <option ${(filter == 0 ? 'selected' + ' ': '')}value="0">Nothing</option>
-                        <option ${(filter == 1 ? 'selected' + ' ': '')}value="1">High</option>
-                        <option ${(filter == 2 ? 'selected' + ' ': '')}value="2">Medium</option>
-                        <option ${(filter == 3 ? 'selected' + ' ': '')}value="3">Low</option>
+                        <option ${(model.ppa.filter == 0 ? 'selected' + ' ': '')}value="0">Nothing</option>
+                        <option ${(model.ppa.filter == 1 ? 'selected' + ' ': '')}value="1">High</option>
+                        <option ${(model.ppa.filter == 2 ? 'selected' + ' ': '')}value="2">Medium</option>
+                        <option ${(model.ppa.filter == 3 ? 'selected' + ' ': '')}value="3">Low</option>
                     </select>
                 </div>
-                <div class="todo-sort">
-                    <label>Sort by</label>
-                    <select name="cars" id="cars" onchange="sortTodos(this)">
-                        <option ${(sorting == 1 ? 'selected' + ' ': '')}value="1">High > Low</option>
-                        <option ${(sorting == 2 ? 'selected' + ' ': '')}value="2">Low > High</option>
-                    </select>
-                </div>
+
                 </div>
         <div class="todos">
-            ${listTodos(filter, sorting)}
+        `;
+        if(model.ppa.filter == 0) {
+            for (let keys in todos) {
+
+                if (todos[keys].completed === true ) {
+                    if (todos[keys].priority === 1) {
+                        html += todoCreateHTML(keys);
+                    }
+            
+            
+                    if (todos[keys].priority === 2) {
+                        html += todoCreateHTML(keys);
+                    }
+         
+                    if (todos[keys].priority === 3) {
+                        html += todoCreateHTML(keys);
+                    }
+                }
+                
+            }
+        }
+        if(model.ppa.filter == 1) {
+            for (let keys in todos) {
+
+                if (todos[keys].completed === true ) {
+
+                    if (todos[keys].priority === 1) {
+                        html += todoCreateHTML(keys);
+                    }
+                }
+                
+            }
+        }
+        if(model.ppa.filter == 2) {
+            for (let keys in todos) {
+
+                if (todos[keys].completed === true ) {
+
+                    if (todos[keys].priority === 2) {
+                        html += todoCreateHTML(keys);
+                    }
+                }
+                
+            }
+        }
+        if(model.ppa.filter == 3) {
+            for (let keys in todos) {
+
+                if (todos[keys].completed === true ) {
+                    if (todos[keys].priority === 3) {
+                        html += todoCreateHTML(keys);
+                    }
+                }
+                
+            }
+        }
+        
+    
+        
+       html += `
             
         </div>
     </div>
     `;
-}
-
-function listTodos(filt, sort) {
-
-    if (sort == 1 || sort == '') {
-        if (filt == 1) {
-            return todoHTML_high;
-        }
-        if (filt == 2) {
-            return todoHTML_medium;
-        }
-        if (filt == 3) {
-            return todoHTML_low;
-        }
-        return todoHTML_high + todoHTML_medium + todoHTML_low;
-    }
-
-    if (sort == 2) {
-        return todoHTML_low + todoHTML_medium + todoHTML_high;
-    }
-
-
-
+    container.innerHTML = html;
 }
 
 

@@ -4,7 +4,7 @@ function addTodo() {
 
     let obj;
 
-    if (!input_title || !input_content || !input_priority) {
+    if (!model.inputs.new.title || !model.inputs.new.content || !model.inputs.new.priority) {
         errors = 'Something is missing....';
     } else {
         errors = '';
@@ -14,17 +14,17 @@ function addTodo() {
             date_added: Date.now(),
             date_edited: '',
             date_finished: '',
-            title: input_title,
-            content: input_content,
-            priority: input_priority,
+            title: model.inputs.new.title,
+            content: model.inputs.new.content,
+            priority: model.inputs.new.priority,
             completed: false,
         };
     }
 
 
-    input_title = '';
-    input_content = '';
-    input_priority = '';
+    model.inputs.new.title = '';
+    model.inputs.new.content = '';
+    model.inputs.new.priority = '';
 
     updateScreen();
 
@@ -33,27 +33,27 @@ function addTodo() {
 
 function editTodo(id) {
 
-    selectedToEdit = id;
+    model.inputs.edit.selectedToEdit = id;
+    
 
-
-    if (input_title_edit == '' && input_content_edit == '') {
-        input_title_edit = todos[id].title;
-        input_content_edit = todos[id].content;
+    if (model.inputs.edit.title == '' && model.inputs.edit.content == '') {
+        model.inputs.edit.title = todos[id].title;
+        model.inputs.edit.content = todos[id].content;
     }
     
-    if (mode == 'edit' && id == selectedToEdit) {
+    if (model.inputs.edit.mode == 'edit' && id == model.inputs.edit.selectedToEdit) {
 
         todos[id].date_edited = Date.now();
-        todos[id].title = input_title_edit;
-        todos[id].content = input_content_edit;
+        todos[id].title = model.inputs.edit.title;
+        todos[id].content = model.inputs.edit.content;
 
-        selectedToEdit = '';
-        input_title_edit = '';
-        input_content_edit = '';
-        mode = '';
+        model.inputs.edit.selectedToEdit = '';
+        model.inputs.edit.title = '';
+        model.inputs.edit.content = '';
+        model.inputs.edit.mode = '';
 
     } else {
-        mode = 'edit';
+        model.inputs.edit.mode = 'edit';
     }
 
 
@@ -62,12 +62,15 @@ function editTodo(id) {
 }
 
 function completeTodo(id) {
-    mode = '';
-    selectedToEdit = '';
-    todos[id].date_finished = Date.now();
-    todos[id].completed = true;
-
+    const obj = todos[id];
+    delete todos[id];
+    model.inputs.edit.mode = '';
+    model.inputs.edit.selectedToEdit = '';
+    obj.date_finished = Date.now();
+    obj.completed = true;
+    todos[keyGen()] = obj;
     updateScreen();
+    return obj;
 }
 
 function removeTodo(id) {
@@ -78,20 +81,12 @@ function removeTodo(id) {
 
 function filterTodos(a) {
     mode = '';
-    filter = a.value;
-    sorting = '';
-    updateScreen();
-}
-
-function sortTodos(a) {
-    mode = '';
-    filter = '';
-    sorting = a.value;
+    model.ppa.filter = a.value;
     updateScreen();
 }
 
 function changeScreen(page) {
-    on_page = page;
+    model.ppa.on_page = page;
     updateScreen();
 }
 
