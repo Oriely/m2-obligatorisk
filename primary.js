@@ -159,14 +159,14 @@ updateScreen();
 function todoCreateHTML(id) {
     return `
         <div class="todo-wrapper${(todos[id].completed === true ? ' fin' : '')}${setPriority(todos[id].priority)}" >
-            <div class="todo-title">${(model.inputs.edit.mode == 'edit' && id == model.inputs.edit.selectedToEdit ? '<input class="edit" type="text" onkeyup="input_title_edit = this.value" value="' + todos[id].title +'">' : '<h1>' + todos[id].title + '</h1>')}</div>
+            <div class="todo-title">${(model.inputs.edit.mode == 'edit' && id == model.inputs.edit.selectedToEdit ? '<input class="edit" type="text" onkeyup="model.inputs.edit.title = this.value" value="' + todos[id].title +'">' : '<h1>' + todos[id].title + '</h1>')}</div>
             <div class="todo-dates">
                 <span>Added: ${stupidToReadableDate(todos[id].date_added)}</span>
                 <span>${(todos[id].date_finished != '' ? 'Completed: ' + stupidToReadableDate(todos[id].date_finished) : '')}</span>
                 <span>${(todos[id].date_edited != '' ? 'Edited: ' + todos[id].date_edited : '')}</span>
             </div>
             <div class="todo-content">  
-                ${(model.inputs.edit.mode == 'edit' && id == model.inputs.edit.electedToEdit ? '<textarea class="edit" onkeyup="input_content_edit = this.value">'+ todos[id].content + '</textarea>' : todos[id].content)}
+                ${(model.inputs.edit.mode == 'edit' && id == model.inputs.edit.electedToEdit ? '<textarea class="edit" onkeyup="model.inputs.edit.content = this.value">'+ todos[id].content + '</textarea>' : todos[id].content)}
             </div>
             <div>Priority: ${(todos[id].priority === 1 ? 'High' : '') || (todos[id].priority === 2 ? 'Medium' : '') ||(todos[id].priority === 3 ? 'Low' : '')}</div>
             <div class="todo-controls-edit">
@@ -201,8 +201,8 @@ function mainPage() {
         </nav>
         
         <div class="input-form">
-            <div class="input-title"><input id="" type="text" onkeyup="input_title = this.value" placeholder="Some title...."></div>
-            <div class="input-content"><textarea onkeyup="input_content = this.value"></textarea></div>
+            <div class="input-title"><input id="" type="text" onkeyup="model.inputs.new.title = this.value" placeholder="Some title...."></div>
+            <div class="input-content"><textarea onkeyup="model.inputs.new.content = this.value"></textarea></div>
             ${(errors ? showErrors() : '')}
             <div class="todo-controls">
             
@@ -210,9 +210,9 @@ function mainPage() {
                     <div><button onclick="addTodo()">Add todo</button></div>
                     <div class="priority">
                         <div><label>Priority: </label></div>
-                        <div><input class="priority" onclick="input_priority = 1" id="high" type="radio" name="priority" value="test" ><label for="high">High</label></div>
-                        <div><input class="priority" onclick="input_priority = 2" id="medium" type="radio"  name="priority"value="test"><label for="medium">Medium</label></div>
-                        <div><input class="priority" onclick="input_priority = 3" id="low" type="radio" name="priority" value="test"><label for="low">Low</label></div>
+                        <div><input class="priority" onclick="model.inputs.new.priority = 1" id="high" type="radio" name="priority" value="test" ><label for="high">High</label></div>
+                        <div><input class="priority" onclick="model.inputs.new.priority = 2" id="medium" type="radio"  name="priority"value="test"><label for="medium">Medium</label></div>
+                        <div><input class="priority" onclick="model.inputs.new.priority = 3" id="low" type="radio" name="priority" value="test"><label for="low">Low</label></div>
                     </div>
                 </div>
                 <div>
